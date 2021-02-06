@@ -11,6 +11,14 @@ const router = new express.Router();
 
 router.get("/", async function(req, res, next) {
   try {
+    // first see if user is searching for customer
+    const { customer: customerSearch} = req.query;
+    // if user searched, display customer searched
+    if (customerSearch) {
+      const customer = await Customer.getByName(customerSearch);
+      return res.render("customer_list.html", { customers: [customer] });
+    }
+    // otherwise, display all customers
     const customers = await Customer.all();
     return res.render("customer_list.html", { customers });
   } catch (err) {

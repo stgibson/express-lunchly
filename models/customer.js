@@ -53,6 +53,33 @@ class Customer {
     return new Customer(customer);
   }
 
+  /** get a customer by ID. */
+  static async getByName(name) {
+    const [firstName, lastName] = name.split(" ");
+    if (!firstName || !lastName) {
+      const err = new Error(`Invalid search! Enter first and last name`);
+      throw err;
+    }
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes 
+        FROM customers WHERE first_name = $1 AND last_name = $2`,
+      [firstName, lastName]
+    );
+
+    const customer = results.rows[0];
+
+    if (customer === undefined) {
+      const err = new Error(`No such customer: ${name}`);
+      throw err;
+    }
+
+    return new Customer(customer);
+  }
+
   /** gets full name of customer */
 
   fullName() {
