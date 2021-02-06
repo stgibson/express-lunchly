@@ -53,7 +53,8 @@ class Customer {
     return new Customer(customer);
   }
 
-  /** get a customer by ID. */
+  /** get a customer by name. */
+
   static async getByName(name) {
     const [firstName, lastName] = name.split(" ");
     if (!firstName || !lastName) {
@@ -78,6 +79,23 @@ class Customer {
     }
 
     return new Customer(customer);
+  }
+
+  /** gets top 10 customers who have made the most reservations */
+
+  static async getTopCustomers() {
+    const results = await db.query(
+      `SELECT c.id,
+         c.first_name AS "firstName",
+         c.last_name AS "lastName", 
+         c.phone, 
+         c.notes,
+         COUNT(c.id) AS "numOfReservations"
+        FROM customers c JOIN reservations r ON c.id=r.customer_id
+        GROUP BY c.id ORDER BY "numOfReservations" DESC LIMIT 10`
+    );
+
+    return results.rows.map(c => new Customer(c));
   }
 
   /** gets full name of customer */
